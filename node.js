@@ -10,7 +10,7 @@ process.stdin.setEncoding('hex');
 process.stdin.setRawMode(true);
 
 process.stdin.on("data", function(b){
-	
+
 	var keyAsHex = b.toString();
 
 	switch ( keyAsHex ) {
@@ -35,11 +35,15 @@ process.stdin.on("data", function(b){
 	// console.log( keyAsHex );
 });
 
-process.stdin.on("keypress", function(b){
-	console.log("hej");
-})
 
 process.on('exit', function(code) {
 	console.log('About to exit with code:', code);
+	
+	if ( code === 0 ) {
+		console.log('exit success');	
+	} else {
+		console.log('exit failure');	
+	}
+
 });
 
