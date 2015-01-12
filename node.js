@@ -6,28 +6,36 @@ var KEYS = {
 	ESC : "1b"
 }
 
+var UNICODE = {
+	LEFT : 8606,
+	UP : 8607,
+	RIGHT : 8608,
+	DOWN : 8609
+}
+
 process.stdin.setEncoding('hex');
 process.stdin.setRawMode(true);
 
 process.stdin.on("data", function(b){
 
-	var keyAsHex = b.toString();
+	process.stdout.write('\033c');
 
+	var keyAsHex = b.toString();
 	switch ( keyAsHex ) {
 		case KEYS.UP:
-			console.log("up");
+			process.stdout.write("up");
 			break;
 		case KEYS.DOWN:
-			console.log("down");
+			process.stdout.write("down");
 			break;
 		case KEYS.RIGHT:
-			console.log("right");
+			process.stdout.write("right");
 			break;
 		case KEYS.LEFT:
-			console.log("left");
+			process.stdout.write("left");
 			break;
 		case KEYS.ESC:
-			console.log("escape");
+			process.stdout.write("escape");
 			process.exit(0);
 			break;
 	}
@@ -36,9 +44,11 @@ process.stdin.on("data", function(b){
 });
 
 
+process.stdout.write( String.fromCharCode(UNICODE.LEFT) );
+
 process.on('exit', function(code) {
 	console.log('About to exit with code:', code);
-	
+
 	if ( code === 0 ) {
 		console.log('exit success');	
 	} else {
