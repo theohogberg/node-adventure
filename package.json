@@ -1,0 +1,19 @@
+{
+  "name": "node-text-adv",
+  "version": "1.0.0",
+  "description": "text adventure platform in node",
+  "main": "node.js",
+  "scripts": {
+    "test": "karma"
+  },
+  "keywords": [
+    "nodejs",
+    "node",
+    "text",
+    "adventure",
+    "game",
+    "platform"
+  ],
+  "author": "thoggy",
+  "license": "MIT"
+}
