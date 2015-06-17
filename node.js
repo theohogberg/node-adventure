@@ -1,91 +1,88 @@
 var util = require('./utils');
-util.readJSON("loc01.json");
-var window_size;
-
+//util.readJSON("loc01.json");
+var DEBUG = 0;
 var KEYS = { 
 	UP : "1b5b41",
 	DOWN : "1b5b42", 
 	RIGHT : "1b5b43", 
 	LEFT : "1b5b44",
-	ESC : "1b"
-};
-
+	ESC : "1b" };
 var UNICODE = {
 	LEFT : 0x21e6,
 	UP : 0x21e7,
 	RIGHT : 0x21e8,
 	DOWN : 0x21e9,
-	RETURN : 0x23CE
-};
+	RETURN : 0x23CE };
 
-function initConsole (encoding, raw, clean, debug) {
-	
-	if (clean)
-		process.stdout.write('\033c');
-	window_size = process.stdout.getWindowSize();
-	process.stdin.setEncoding(encoding);
-	process.stdin.setRawMode(raw);
-	process.stdin.on("data", function(b){
-
-		process.stdout.write('\033c'); //clear
-
-		var keyAsHex = b.toString();
-		switch ( keyAsHex ) {
-			case KEYS.UP:
-				process.stdout.write(String.fromCharCode(UNICODE.UP)+'\n');
-				break;
-			case KEYS.DOWN:
-				process.stdout.write(String.fromCharCode(UNICODE.DOWN)+'\n');
-				break;
-			case KEYS.RIGHT:
-				process.stdout.write(String.fromCharCode(UNICODE.LEFT)+'\n');
-				break;
-			case KEYS.LEFT:
-				process.stdout.write(String.fromCharCode(UNICODE.RIGHT)+'\n');
-				break;
-			case KEYS.ESC:
-				process.stdout.write(String.fromCharCode(UNICODE.RETURN)+'\n');
-				process.exit(0);
-				break;
-		}
-
-	});
-
-	if (debug) {
-		if (process.stdout.isTTY) {
-			console.log("The console size is:", process.stdout.getWindowSize());
-		} else {
-			console.log("stdout is not a console");
-		}
-
-		process.on('exit', function(code) {
-			console.log('\nAbout to exit with code:', code);
-
-			if ( code === 0 ) {
-				console.log('exit success');	
-			} else {
-				console.log('exit failure');	
-			}
-
-		});
-
-	}
-	
+function Console (proc, fn, encoding, raw) {
+	this.process = proc;	
+	this.win_size = process.stdout.getWindowSize(0);
+	this.process.stdin.setEncoding(encoding || 'hex');
+	this.process.stdin.setRawMode(raw || true);
 }
 
-function printAt (idx, idy, string) {
-	var cols = window_size[0];
-	// console.log(idy*cols);
+Console.prototype.setMain = function (fn) {
+	this.process.stdin.on("data", fn.bind(this));
+}
+
+Console.prototype.printAt = function (idx, idy, char) {
+	var cols = this.win_size[0];
 	for ( var i = 0 ; i < (idy*cols)+idx ; i++ ) {
-		process.stdout.write('1');
+		this.process.stdout.write(' ');
 	}
-	process.stdout.write(string);
+	this.process.stdout.write(char);
+}
+
+Console.prototype.printMap = function (array) {
+			
 }
 
 
-initConsole('hex', true, true);
+function printKeys (b) {
+	this.process.stdout.write('\033c'); //clear
+	var keyAsHex = b.toString();
 
-printAt(1, 0, '0');
+//	this.printAt(2, 0, 'c');
+	switch ( keyAsHex ) {
+		case KEYS.UP:
+			this.process.stdout.write(String.fromCharCode(UNICODE.UP)+'\n');
+			break;
+		case KEYS.DOWN:
+			this.process.stdout.write(String.fromCharCode(UNICODE.DOWN)+'\n');
+			break;
+		case KEYS.RIGHT:
+			this.process.stdout.write(String.fromCharCode(UNICODE.LEFT)+'\n');
+			break;
+		case KEYS.LEFT:
+			this.process.stdout.write(String.fromCharCode(UNICODE.RIGHT)+'\n');
+			break;
+		case KEYS.ESC:
+			this.process.stdout.write(String.fromCharCode(UNICODE.RETURN)+'\n');
+			this.process.exit(0);
+			break;
+	}
+
+}
+
+var c = new Console(process);
+c.setMain( printKeys )
 
 
+
+if (DEBUG) {
+	if (process.stdout.isTTY) {
+		console.log("The console size is:", process.stdout.getWindowSize());
+	} else {
+		console.log("stdout is not a console");
+	}
+
+	process.on('exit', function(code) {
+		console.log('\nAbout to exit with code:', code);
+		if ( code === 0 ) {
+			console.log('exit success');	
+		} else {
+			console.log('exit failure');	
+		}
+	});
+}
 
